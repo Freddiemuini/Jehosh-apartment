@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jehosh Apartment - Rent Management System</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-building"></i>
+                <h2>Jehosh Apartments</h2>
+                <p>Ivenche</p>
+            </div>
+            <nav class="nav-menu">
+                <button class="nav-btn active" data-tab="dashboard"><i class="fas fa-chart-line"></i> Dashboard</button>
+                <button class="nav-btn" data-tab="units"><i class="fas fa-home"></i> Units</button>
+                <button class="nav-btn" data-tab="tenants"><i class="fas fa-users"></i> Tenants</button>
+                <button class="nav-btn" data-tab="payments"><i class="fas fa-money-bill-wave"></i> Payments</button>
+                <button class="nav-btn" data-tab="record-payment"><i class="fas fa-receipt"></i> Record Payment</button>
+            </nav>
+            <div class="paybill-info">
+                <i class="fas fa-phone-alt"></i>
+                <span>Paybill: <strong>505368</strong></span>
+                <span>Account: Your phone/tenant number</span>
+            </div>
+        </aside>
+        <main class="main-content">
+            <div id="dashboard" class="tab-content active">
+                <h1><i class="fas fa-chart-line"></i> Dashboard</h1>
+                <div class="stats-grid" id="statsGrid"></div>
+                <div class="recent-payments">
+                    <h3>Recent Payments</h3>
+                    <table id="recentPaymentsTable">
+                        <thead><tr><th>Tenant</th><th>Amount</th><th>Date</th><th>Month</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="units" class="tab-content">
+                <h1><i class="fas fa-home"></i> Apartment Units</h1>
+                <button class="btn-primary" id="addUnitBtn"><i class="fas fa-plus"></i> Add Unit</button>
+                <div class="units-grid" id="unitsGrid"></div>
+            </div>
+            <div id="tenants" class="tab-content">
+                <h1><i class="fas fa-users"></i> Tenants</h1>
+                <button class="btn-primary" id="addTenantBtn"><i class="fas fa-user-plus"></i> Register Tenant</button>
+                <div class="tenants-table-container">
+                    <table id="tenantsTable">
+                        <thead><tr><th>Name</th><th>Phone</th><th>Unit</th><th>Rent</th><th>Account No</th><th>Lease Period</th><th>Actions</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="payments" class="tab-content">
+                <h1><i class="fas fa-money-bill-wave"></i> Payment History</h1>
+                <div class="payments-table-container">
+                    <table id="paymentsTable">
+                        <thead><tr><th>Tenant</th><th>Amount</th><th>Paybill</th><th>Account</th><th>Trans Code</th><th>Date</th><th>Month For</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="record-payment" class="tab-content">
+                <h1><i class="fas fa-receipt"></i> Record Rent Payment</h1>
+                <div class="payment-form-card">
+                    <p class="info-note"><i class="fas fa-info-circle"></i> Use Paybill <strong>505368</strong> and tenant's Account Number (provided during registration). Enter M-Pesa transaction code below.</p>
+                    <form id="paymentForm">
+                        <div class="form-group">
+                            <label for="accNumber">Account Number (Tenant's unique number)</label>
+                            <input type="text" id="accNumber" name="accNumber" placeholder="e.g., JOSH0001 or 0712345678" title="Tenant account number" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="amount">Amount (KES)</label>
+                            <input type="number" id="amount" name="amount" placeholder="0.00" title="Amount in KES" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="paybill">Paybill Number</label>
+                            <input type="text" id="paybill" name="paybill" value="505368" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="transCode">M-Pesa Transaction Code</label>
+                            <input type="text" id="transCode" name="transCode" placeholder="e.g., QWERTY123" title="M-Pesa transaction code">
+                        </div>
+                        <div class="form-group">
+                            <label for="monthPaid">Month Paid For (YYYY-MM)</label>
+                            <input type="text" id="monthPaid" name="monthPaid" placeholder="YYYY-MM" pattern="\d{4}-\d{2}" title="Enter year and month in YYYY-MM format (e.g., 2025-04)" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Record Payment</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Unit -->
+    <div id="unitModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="unitModalTitle">Add Unit</h2>
+            <form id="unitForm">
+                <input type="hidden" id="unitId">
+                <div class="form-group">
+                    <label for="unitNumber">Unit Number</label>
+                    <input type="text" id="unitNumber" name="unitNumber" placeholder="e.g., A1" title="Unit number" required>
+                </div>
+                <div class="form-group">
+                    <label for="unitType">Unit Type</label>
+                    <input type="text" id="unitType" name="unitType" placeholder="Studio, 1BR" title="Unit type">
+                </div>
+                <div class="form-group">
+                    <label for="monthlyRent">Monthly Rent (KES)</label>
+                    <input type="number" id="monthlyRent" name="monthlyRent" placeholder="0.00" title="Monthly rent in KES" step="0.01" required>
+                </div>
+                <button type="submit" class="btn-primary">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Tenant -->
+    <div id="tenantModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="tenantModalTitle">Register Tenant</h2>
+            <form id="tenantForm">
+                <input type="hidden" id="tenantId">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" name="fullName" placeholder="Full name" title="Full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="tel" id="phone" name="phone" placeholder="e.g., 0712345678" title="Phone number" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="email@example.com" title="Email address">
+                </div>
+                <div class="form-group">
+                    <label for="accountNumber">Account Number (Leave blank to auto-generate)</label>
+                    <input type="text" id="accountNumber" name="accountNumber" placeholder="Auto‑generated if left empty" title="Tenant account number">
+                </div>
+                <div class="form-group">
+                    <label for="unitSelect">Select Unit</label>
+                    <select id="unitSelect" name="unitSelect" title="Select a unit" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="leaseStart">Lease Start Date</label>
+                    <input type="date" id="leaseStart" name="leaseStart" placeholder="YYYY-MM-DD" title="Lease start date" required>
+                </div>
+                <div class="form-group">
+                    <label for="leaseEnd">Lease End Date</label>
+                    <input type="date" id="leaseEnd" name="leaseEnd" placeholder="YYYY-MM-DD" title="Lease end date" required>
+                </div>
+                <button type="submit" class="btn-primary">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
